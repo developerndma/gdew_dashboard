@@ -1,0 +1,7 @@
+services:
+  precip-dashboard:
+    build: .
+    container_name: precip-dashboard
+    ports:
+      - "${HOST_PORT:-5003}:80"
+    restart: unless-stopped

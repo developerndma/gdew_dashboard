@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Precipitation Outlook Dashboard</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Mapbox GL JS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.5.1/mapbox-gl.js"></script>
+
+    <!-- Iconify -->
+    <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+    <div class="export-wrapper">
+        <div class="aurora"></div>
+
+        <div class="dashboard">
+
+            <!-- Mobile-only topbar (hidden on ≥768px via CSS) -->
+            <div class="mobile-topbar">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+                    <iconify-icon icon="lucide:menu" width="18"></iconify-icon>
+                </button>
+                <span class="mobile-brand-text">Global DEW · Precipitation Outlook 2026</span>
+                <button class="mobile-menu-btn" id="mobileGuideBtn" aria-label="Open guide">
+                    <iconify-icon icon="lucide:circle-help" width="18"></iconify-icon>
+                </button>
+            </div>
+
+            <!-- Mobile overlay -->
+            <div class="mobile-overlay" id="mobileOverlay"></div>
+
+            <!-- CONTROLS -->
+            <div class="controls" id="controls">
+
+                <div class="panel">
+                    <div class="brand">
+                        <div class="brand-title">
+                            <img src="https://i.postimg.cc/dQgn5wHB/ndma-logo.png" alt="NDMA Logo" class="brand-logo">
+                            <h1>Global DEW <br>Precipitation Outlook 2026</h1>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="month-grid">
+
+                        <div class="quarter q1">
+                            <div class="quarter-title">DEW 1</div>
+                            <button class="m-btn">Jan</button>
+                            <button class="m-btn">Feb</button>
+                            <button class="m-btn">Mar</button>
+                        </div>
+
+                        <div class="quarter q2">
+                            <div class="quarter-title">DEW 2</div>
+                            <button class="m-btn" data-month="april">Apr</button>
+                            <button class="m-btn" data-month="may">May</button>
+                            <button class="m-btn" data-month="june">Jun</button>
+                        </div>
+
+                        <div class="quarter q3">
+                            <div class="quarter-title">DEW 3</div>
+                            <button class="m-btn" data-month="july">Jul</button>
+                            <button class="m-btn" data-month="august">Aug</button>
+                            <button class="m-btn" data-month="september">Sep</button>
+                        </div>
+
+                        <div class="quarter q4">
+                            <div class="quarter-title">DEW 4</div>
+                            <button class="m-btn">Oct</button>
+                            <button class="m-btn">Nov</button>
+                            <button class="m-btn">Dec</button>
+                        </div>
+
+                    </div>
+                    
+                </div>
+
+                <div class="panel">
+                    <div class="filters">
+
+                        <!-- Compact checkbox row -->
+                        
+
+                        <div class="field">
+                            <label for="continentSelect">Continent</label>
+                            <select id="continentSelect"></select>
+                        </div>
+
+                        <div class="field">
+                            <label class="with-check">
+                                Region
+                                <input type="checkbox" id="regionCheck">
+                                <span class="checkmark"></span>
+                            </label>
+                            <select id="RegionSelect"></select>
+                        </div>
+
+                        <div class="field">
+                            <label for="countrySelect">Country</label>
+                            <select id="countrySelect"></select>
+                        </div>
+
+                        <div class="panel apply">
+                            <button id="applyBtn">Apply Filters</button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">
+                        <h3>Trends</h3>
+                    </div>
+                    <div style="display:grid; gap:10px">
+                        <div class="chip" style="justify-content:space-between; border-radius:16px">
+                            <span style="display:inline-flex; align-items:center; gap:10px">
+                                <span style="width:10px;height:10px;border-radius:99px;background:var(--c-cyan)"></span>
+                                Historic (2025)
+                            </span>
+                            <span id="historicValue" style="font-weight:950; color: var(--c-emerald)"></span>
+                        </div>
+                        <div class="chip" style="justify-content:space-between; border-radius:16px">
+                            <span style="display:inline-flex; align-items:center; gap:10px">
+                                <span
+                                    style="width:10px;height:10px;border-radius:99px;background:var(--c-amber)"></span>
+                                Projected (2026)
+                            </span>
+                            <span id="forecastValue" style="font-weight:950; color: var(--c-lime)"></span>
+                        </div>
+                        <div class="chip" style="justify-content:space-between; border-radius:16px">
+                            <span style="display:inline-flex; align-items:center; gap:10px">
+                                <span style="width:10px;height:10px;border-radius:99px;background:var(--c-pink)"></span>
+                                Anomaly
+                            </span>
+                            <span id="anomolyValue" style="font-weight:950; color: var(--c-pink)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Drawer close (last in DOM; order:-1 in CSS moves it to top visually on mobile) -->
+                <button class="drawer-close" id="drawerClose" aria-label="Close menu">
+                    <iconify-icon icon="lucide:x" width="14"></iconify-icon>
+                </button>
+
+            </div>
+            <!-- Mobile-only trends panel (above forums; hidden on desktop) -->
+            <div class="mobile-trends">
+                <div class="mtrend-header">
+                    <span class="mtrend-title">Trends</span>
+                </div>
+                <div class="mtrend-cards">
+                    <div class="mtrend-card" style="border-color:rgba(34,211,238,0.22)">
+                        <span class="mtrend-dot" style="background:var(--c-cyan)"></span>
+                        <span class="mtrend-label">Historic (2025)</span>
+                        <span id="historicValue-m" class="mtrend-val" style="color:var(--c-emerald)">—</span>
+                    </div>
+                    <div class="mtrend-card" style="border-color:rgba(251,191,36,0.22)">
+                        <span class="mtrend-dot" style="background:var(--c-amber)"></span>
+                        <span class="mtrend-label">Projected (2026)</span>
+                        <span id="forecastValue-m" class="mtrend-val" style="color:var(--c-lime)">—</span>
+                    </div>
+                    <div class="mtrend-card" style="border-color:rgba(251,113,133,0.22)">
+                        <span class="mtrend-dot" style="background:var(--c-pink)"></span>
+                        <span class="mtrend-label">Anomaly</span>
+                        <span id="anomolyValue-m" class="mtrend-val" style="color:var(--c-pink)">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forums -->
+            <div class="mini-wrap" style="display: none;">
+            <div class="mini-checks" aria-label="Country groups">
+                <span class="mini-label mini-label--partner">Multilateral Forums</span>
+
+                <label class="mini">
+                    <input type="checkbox" id="optSIDS" />
+                    <span class="chip">SIDS</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optSCO" />
+                    <span class="chip">SCO</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optSAARC" />
+                    <span class="chip">SAARC</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optOIC" />
+                    <span class="chip">OIC</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optICIMOD" />
+                    <span class="chip">ICIMOD</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optEU" />
+                    <span class="chip">EU</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optECO" />
+                    <span class="chip">ECO</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optCommonwealth" />
+                    <span class="chip">Commonwealth</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optASEAN" />
+                    <span class="chip">ASEAN</span>
+                </label>
+
+                <label class="mini">
+                    <input type="checkbox" id="optAfricanUnion" />
+                    <span class="chip">African Union</span>
+                </label>
+            </div>
+
+            <!-- Guide Button -->
+            <button class="guide-btn" id="guideBtn" aria-label="How to use this portal">
+                <iconify-icon icon="lucide:circle-help" width="15"></iconify-icon>
+                <span>How to Use</span>
+            </button>
+
+            </div>
+
+            <!-- Guide Modal -->
+            <div class="guide-overlay" id="guideOverlay" role="dialog" aria-modal="true" aria-label="Portal Guide">
+                <div class="guide-modal">
+                    <div class="guide-header">
+                        <div class="guide-header-left">
+                            <iconify-icon icon="lucide:book-open" width="18"></iconify-icon>
+                            <h2>How to Use the Portal</h2>
+                        </div>
+                        <button class="guide-close" id="guideClose" aria-label="Close guide">
+                            <iconify-icon icon="lucide:x" width="14"></iconify-icon>
+                        </button>
+                    </div>
+                    <div class="guide-body">
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(34,211,238,0.12);border-color:rgba(34,211,238,0.3);color:var(--c-cyan)">
+                                <iconify-icon icon="lucide:calendar" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Select a Month</h3>
+                                <p>Use the <strong>DEW 1–4</strong> quarter panels to pick a month (Jan–Dec). The active month highlights in blue — both maps and the chart will update automatically.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(96,165,250,0.12);border-color:rgba(96,165,250,0.3);color:var(--c-blue)">
+                                <iconify-icon icon="lucide:filter" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Apply Geographic Filters</h3>
+                                <p>Choose a <strong>Continent</strong>, <strong>Region</strong>, or <strong>Country</strong> from the dropdowns. Enable the Region checkbox to activate sub-region filtering. Click <strong>Apply Filters</strong> to zoom the maps and refresh the chart.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.3);color:var(--c-violet)">
+                                <iconify-icon icon="lucide:trending-up" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Read the Trends Panel</h3>
+                                <p>The <strong>Trends</strong> panel shows three values for your selected area and month: <span style="color:var(--c-cyan)">Historic (2025)</span> actual precipitation, <span style="color:var(--c-lime)">Projected (2026)</span> forecast, and <span style="color:var(--c-pink)">Anomaly</span> (deviation from normal). Values update when filters are applied.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(132,204,22,0.12);border-color:rgba(132,204,22,0.3);color:var(--c-lime)">
+                                <iconify-icon icon="lucide:map" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Explore the Maps</h3>
+                                <p>Two side-by-side maps display precipitation intensity — <strong>2025</strong> (historic) on the right and <strong>2026</strong> (forecast) on the left. The colour gradient runs from <em>Low</em> (cool tones) to <em>High</em> (warm tones) as shown in the legend. Drag to pan and scroll to zoom either map.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(34,197,94,0.12);border-color:rgba(34,197,94,0.3);color:var(--c-emerald)">
+                                <iconify-icon icon="lucide:globe-2" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Multilateral Forums</h3>
+                                <p>Toggle any of the <strong>Forum</strong> chips (SIDS, SCO, OIC, EU, ASEAN, etc.) to highlight the member countries on the maps. Multiple forums can be active simultaneously.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-step-icon" style="background:rgba(251,191,36,0.12);border-color:rgba(251,191,36,0.3);color:var(--c-amber)">
+                                <iconify-icon icon="lucide:bar-chart-2" width="16"></iconify-icon>
+                            </div>
+                            <div class="guide-step-content">
+                                <h3>Precipitation Trend Chart</h3>
+                                <p>The bottom chart shows <strong>2010–2026</strong> precipitation (mm) for the selected region. The <span style="color:var(--c-cyan)">blue line</span> traces historic values; the <span style="color:var(--c-amber)">amber line</span> shows the 2026 forecast. Hover over data points for exact values.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="content">
+
+
+                                <!-- Chart -->
+                <div class="chart-card">
+                    <div class="chart-head">
+                        <div class="chart-title-wrap">
+                            <strong>Precipitation Trends (mm) · 2010–2026</strong>
+                            <span id="chartFilterLabel" class="chart-filter-label" style="display:none"></span>
+                        </div>
+                        <div class="chart-legend">
+                            <span class="lg"><span class="sw a"></span>Historic</span>
+                            <span class="lg"><span class="sw b"></span>Forecast</span>
+                        </div>
+                    </div>
+                    <div id="regional-pies-div" class="chart" style="padding:0; border:none; background:transparent;">
+                        <canvas id="precipChart"></canvas>
+                    </div>
+
+                </div>
+                
+
+
+                <!-- Map 2 -->
+                <div class="map-card">
+                    <div class="map-title">
+                        2026
+                    </div>
+
+                    <div class="legend">
+                        <h3>Intensity</h3>
+                        <div class="grad"></div>
+                        <div class="labels"><span>Low</span><span>High</span></div>
+                    </div>
+
+                    <div id="mapForecast" class="map"></div>
+                </div>
+
+                <!-- Map 1 -->
+                <div class="map-card">
+                
+                    <div class="map-title">
+                        2025
+                    </div>
+                    <div id="mapHistoric" class="map">
+                
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/vX.Y.Z/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
+    <!-- JavaScript -->
+    <script type="module" src="./script.js"></script>
+</body>
+
+</html>
