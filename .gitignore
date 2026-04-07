@@ -3,3 +3,8 @@ node_modules/
 gdew_github_token
 gdew_github_token.pub
 .env
+
+.env
+.env.*
+gdew_github_token
+gdew_github_token.pub
