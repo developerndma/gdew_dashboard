@@ -19,7 +19,27 @@ import {
 
 
 // ── Mapbox ────────────────────────────────────────────────────────────────
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN?.trim() || "";
+
+function showMapConfigError(message) {
+  document.querySelectorAll(".map").forEach((el) => {
+    if (!el) return;
+    el.classList.add("map-disabled");
+    el.textContent = message;
+  });
+}
+
+function hasMapboxToken() {
+  return MAPBOX_TOKEN.length > 0;
+}
+
+if (hasMapboxToken()) {
+  mapboxgl.accessToken = MAPBOX_TOKEN;
+} else {
+  const message = "Map unavailable: set VITE_MAPBOX_TOKEN and restart the Vite server.";
+  console.error(message);
+  showMapConfigError(message);
+}
 
 export let WB_LYR = "world_boundaries_outline";
 export let GEOSERVER_WMS = "/wms-proxy";
@@ -43,12 +63,14 @@ export const WMS_LAYERS = {
 };
 
 // Create the maps
-const mapHistoric = buildGlobeMap("mapHistoric");
-const mapForecast = buildGlobeMap("mapForecast");
+const mapHistoric = hasMapboxToken() ? buildGlobeMap("mapHistoric") : null;
+const mapForecast = hasMapboxToken() ? buildGlobeMap("mapForecast") : null;
 
 // Syncing
-syncMaps(mapHistoric, mapForecast);
-syncMaps(mapForecast, mapHistoric);
+if (mapHistoric && mapForecast) {
+  syncMaps(mapHistoric, mapForecast);
+  syncMaps(mapForecast, mapHistoric);
+}
 
 
 // scripts.js
@@ -101,6 +123,11 @@ ORG_TOGGLES.forEach((t) => {
 const regionCheck = document.getElementById("regionCheck");
 
 regionCheck.addEventListener("change", () => {
+  if (!mapForecast) {
+    regionCheck.checked = false;
+    return;
+  }
+
   if (regionCheck.checked) add_regional_charts(mapForecast);
   else remove_regional_charts();
 });

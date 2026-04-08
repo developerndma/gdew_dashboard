@@ -176,6 +176,8 @@ export function wmsTile(layerFullName) {
 }
 
 export function addRasterLayer(map, month, year) {
+  if (!map) return;
+
   // Remove all existing DEW raster layers first
   removeAllDewRasters(map);
 
@@ -226,8 +228,11 @@ function removeAllDewRasters(map) {
 }
 
 export function buildGlobeMap(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return null;
+
   const map = new mapboxgl.Map({
-    container: containerId,
+    container,
     style: "mapbox://styles/mapbox/dark-v11",
     projection: "globe",
     center: [69.3451, 30.3753],
@@ -253,6 +258,8 @@ export function buildGlobeMap(containerId) {
 }
 
 export function syncMaps(source, target) {
+  if (!source || !target) return;
+
   source.on("move", () => {
     if (syncing) return;
     syncing = true;
@@ -527,6 +534,8 @@ function detachBumpToTop(map) {
 
 // Public API
 export function setOrgCountriesOutline(map, countryListLikeFiltersJsArray) {
+  if (!map) return;
+
   const names = extractCountryNames(countryListLikeFiltersJsArray);
   const namesLower = names.map(normStr).filter(Boolean);
 

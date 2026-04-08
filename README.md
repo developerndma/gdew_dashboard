@@ -8,6 +8,7 @@
 ### Installation
 ```bash
 npm install
+cp .env.example .env
 ```
 
 ### Development Server
@@ -34,7 +35,7 @@ precip-dashboard/
 ```
 
 ## Notes
-- The dashboard uses **Mapbox GL JS** for globe maps (API token already embedded)
+- The dashboard uses **Mapbox GL JS** for globe maps and requires `VITE_MAPBOX_TOKEN` in `.env`
 - **Chart.js** handles the precipitation trend chart
 - **GeoServer** boundary tiles are fetched from `http://172.18.7.21:8080`
 - Vite serves all static assets with HMR in development mode
